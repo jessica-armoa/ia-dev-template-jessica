@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from app.routers import historial
 
 # Carga variables de entorno desde .env (no falla si .env no existe)
 load_dotenv()
@@ -73,3 +74,4 @@ async def health_check() -> HealthResponse:
 
 # Aquí agregaremos más adelante los routers:
 # app.include_router(agent_router)
+app.include_router(historial.router)
