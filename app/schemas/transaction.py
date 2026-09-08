@@ -1,6 +1,6 @@
 from typing import Optional
 from decimal import Decimal
-from datetime import date
+from datetime import date as dt_date
 from pydantic import BaseModel, Field
 
 class TransactionQueryRequest(BaseModel):
@@ -14,14 +14,14 @@ class TransactionQueryRequest(BaseModel):
     # POR QUÉ (date): Aseguramos que la entrada sea una fecha válida (YYYY-MM-DD).
     # Nota: La validación de que no supere los 90 días en el pasado corresponde
     # a las reglas de negocio (Service), por ende no se aplica aquí en el Schema.
-    start_date: date = Field(
+    start_date: dt_date = Field(
         ...,
         description="Fecha de inicio para el filtrado de transacciones."
     )
     
     # POR QUÉ (date): Aseguramos el formato correcto de fecha. 
     # La comparación entre start_date y end_date va en el Service (lógica de negocio).
-    end_date: date = Field(
+    end_date: dt_date = Field(
         ...,
         description="Fecha de fin para el filtrado de transacciones."
     )
@@ -69,7 +69,7 @@ class Transaction(BaseModel):
     Excluye datos completos de tarjeta y autenticación por seguridad.
     """
     id: str = Field(..., description="Identificador único de la transacción.")
-    date: date = Field(..., description="Fecha en la que se realizó la transacción.")
+    date: dt_date = Field(..., description="Fecha en la que se realizó la transacción.")
     status: str = Field(
         ..., 
         description="Estado actual de la transacción (ej. Aprobada, Rechazada, Anulada)."
