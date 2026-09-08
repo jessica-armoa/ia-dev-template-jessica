@@ -1,6 +1,6 @@
-import pytest
-from fastapi.testclient import TestClient
 from datetime import date, timedelta
+
+from fastapi.testclient import TestClient
 
 from app.main import app
 
@@ -11,11 +11,11 @@ def test_post_transactions_query_happy_path_201():
     1. Happy Path (201): Consulta exitosa que cumple con todas las reglas y el PRD.
     """
     # Arrange
-    # Calculamos fechas relativas al día de hoy para que el test sea determinístico y 
+    # Calculamos fechas relativas al día de hoy para que el test sea determinístico y
     # no falle por reglas de antigüedad (> 90 días) independientemente de cuándo se ejecute.
     today = date.today()
     start_dt = today - timedelta(days=15)
-    
+
     payload = {
         "start_date": start_dt.isoformat(),
         "end_date": today.isoformat(),
@@ -32,7 +32,7 @@ def test_post_transactions_query_happy_path_201():
     # Assert
     # Comportamiento esperado: La petición se acepta y crea/devuelve el recurso paginado (201)
     assert response.status_code == 201
-    
+
     data = response.json()
     # Aseguramos que la estructura de la respuesta cumple el contrato paginado (TransactionPaginatedResponse)
     assert "data" in data
@@ -61,10 +61,10 @@ def test_post_transactions_query_invalid_field_422():
     # Assert
     # Comportamiento esperado: Pydantic intercepta la petición y FastApi devuelve 422
     assert response.status_code == 422
-    
+
     response_data = response.json()
     assert "detail" in response_data
-    
+
     # Comportamiento esperado: El error apunta específicamente al campo 'page'
     error_locs = [error["loc"] for error in response_data["detail"]]
     assert any("page" in loc for loc in error_locs)
@@ -79,8 +79,8 @@ def test_post_transactions_query_prd_edge_case_400():
     # Arrange
     today = date.today()
     # Generamos una fecha claramente superior a los 90 días permitidos
-    start_dt_out_of_bounds = today - timedelta(days=120) 
-    
+    start_dt_out_of_bounds = today - timedelta(days=120)
+
     payload = {
         "start_date": start_dt_out_of_bounds.isoformat(),
         "end_date": today.isoformat(),
@@ -94,7 +94,7 @@ def test_post_transactions_query_prd_edge_case_400():
     # Assert
     # Comportamiento esperado: El controlador / servicio rechaza la petición antes de procesarla (400)
     assert response.status_code == 400
-    
+
     response_data = response.json()
     # Comportamiento esperado: El mensaje de error menciona la regla de negocio de los 90 días
     assert "90" in response_data.get("detail", "")

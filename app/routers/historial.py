@@ -1,10 +1,14 @@
 from fastapi import APIRouter
-from app.schemas.transaction import TransactionQueryRequest, TransactionPaginatedResponse
+
+from app.schemas.transaction import (
+    TransactionPaginatedResponse,
+    TransactionQueryRequest,
+)
 from app.services.historial_service import HistorialService
 
 router = APIRouter()
 
-# Nota: El test utiliza POST /transactions/query y envía JSON, 
+# Nota: El test utiliza POST /transactions/query y envía JSON,
 # por lo tanto mantenemos este verbo y ruta para que los tests pasen en verde.
 @router.post("/transactions/query", response_model=TransactionPaginatedResponse, status_code=201)
 def query_transactions(request: TransactionQueryRequest):
