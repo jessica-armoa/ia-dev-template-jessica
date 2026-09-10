@@ -5,9 +5,15 @@ from openai import OpenAI, OpenAIError
 from app.agent.logger import log_step
 from app.agent.tools import buscar_regla_prd
 
+
+# Baranda #3 · BUDGET · límite de iteraciones del loo
 MAX_STEPS = 5
 
-SYSTEM_PROMPT = """Sos un agente RAG especializado en el Historial de Transacciones · LegacyPay.
+# Baranda #1 · SCOPE · en el SYSTEM_PROMPT
+SYSTEM_PROMPT = (
+    "Sos un agente RAG sobre el PRD de Historial de Transacciones LegacyPay. "
+    "Solo respondés sobre el PRD; si te preguntan otra cosa decís 'fuera de alcance'. "
+    """Sos un agente RAG especializado en el Historial de Transacciones · LegacyPay.
 Tu objetivo es responder consultas del usuario basándote ÚNICAMENTE en el PRD.
 REGLAS ESTRICTAS:
 1. Solo respondés sobre el PRD. Si te preguntan otra cosa decís 'fuera de alcance'.
@@ -29,6 +35,7 @@ En cada iteración, debes decidir qué acción tomar. DEBES responder ÚNICAMENT
 Herramientas disponibles:
 - buscar_regla_prd: Busca lexicalmente un término en el PRD y devuelve contexto.
 """
+)
 
 def run_agent(query: str, client: OpenAI | None = None) -> str:
     """
