@@ -68,16 +68,16 @@
 
 | Campo | Detalle |
 |-------|---------|
-| **Fecha** | YYYY-MM-DD |
-| **Herramienta** | |
-| **Contexto** | |
-| **Prompt exacto (o resumen)** | |
-| **Sugerencia de la IA** | |
-| **Decisión tomada** | |
-| **Impacto en el código** | |
+| **Fecha** | 2026-09-09 |
+| **Herramienta** | Gemini Antigravity |
+| **Contexto** | Creación del esqueleto inicial de un agente RAG con el patrón ReAct para interactuar con el PRD. |
+| **Prompt exacto (o resumen)** | Generar el esqueleto inicial del agente en Python 3.12 (tools, loop, logger) limitando los pasos a `MAX_STEPS = 5`, usando el prompt del sistema como baranda, e integrando un Mock LLM. |
+| **Sugerencia de la IA** | La IA construyó `tools.py` para la búsqueda en el PRD, `logger.py` para registro en JSONL, y `loop.py` para el control de iteraciones ReAct utilizando un objeto JSON estructurado como salida. |
+| **Decisión tomada** | Aceptada. Además, se hizo un ajuste posterior a la función `run_agent` para permitir la inyección de dependencias del cliente de OpenAI. |
+| **Impacto en el código** | Archivos nuevos: `app/agent/tools.py`, `app/agent/logger.py`, `app/agent/loop.py`. |
 
 **Razonamiento en tus palabras:**
->
+> La IA fue clave para generar rápidamente la estructura *boilerplate* (herramienta de búsqueda léxica y esquema JSON) y armar el bucle principal de interacción ReAct que se comunica con el mock LLM respetando las reglas impuestas.
 
 ---
 
@@ -88,14 +88,17 @@
 ## Reflexión final
 
 Responde al finalizar el proyecto (mínimo 100 palabras):
-
 1. **¿En qué partes del proyecto la IA fue más útil?** ¿Por qué?
+> La IA fue particularmente útil para la estructuración rápida de la lógica de dominio (repositorios, servicios, routers) y para el diseño inicial del agente RAG. Al trabajar con esquemas y reglas predefinidas en el PRD, la IA pudo interpretar el contexto e implementar funciones completas (como el bucle ReAct, el JSON formatter de logs y la integración del Mock LLM) en minutos, resolviendo eficientemente la redacción del _boilerplate_.
 
 2. **¿En qué partes la IA generó código que tuviste que corregir?** Describe el error y cómo lo detectaste.
+> Generó código que requirió ajustes de arquitectura, como cuando el agente inicialmente no previó permitir la inyección de la dependencia del cliente de OpenAI, provocando fallos cuando quise probar el flujo con una instancia preexistente. Además, hubo fricción con el nivel de tipado estricto (no se anotaron los tipos en listas vacías generando advertencias de mypy) y el uso de `Exception` genérico que fue detectado y rechazado por el linter (Ruff BLE001). Todo se detectó al correr las comprobaciones obligatorias locales (`uv run ruff check` y `mypy`).
 
 3. **¿Hubo alguna sugerencia de la IA que rechazaste completamente?** ¿Cuál fue tu razonamiento?
+> Rechacé el uso de bloques genéricos `except Exception:` para atrapar fallos durante las llamadas al LLM y lectura de archivos. Razonamiento: Ocultar excepciones de forma general es una mala práctica de ingeniería que puede esconder problemas como `SyntaxError` o `KeyboardInterrupt`. Exigí que la captura fuera reemplazada explícitamente por `OSError` o `OpenAIError`.
 
 4. **¿Cómo cambió tu flujo de trabajo al usar IA vs no usarla?** ¿Fuiste más rápido? ¿Cometiste errores distintos?
+> Pasé de ser un "codificador de líneas" a un "auditor / gerente de agentes". Definitivamente la velocidad de producción aumentó enormemente (especialmente en la generación de la capa de API y las _tools_ del agente). Mis errores pasaron de ser "olvido de un punto y coma" a problemas semánticos y de compatibilidad de herramientas (conflictos con Ruff o versiones de Mypy), exigiendo que me vuelva más crítico al revisar el código antes de darle el visto bueno.
 
 5. **Completa esta frase:** "Como Agent Manager, el mayor riesgo de usar IA sin supervisión en este proyecto habría sido..."
-
+> "...permitir que el agente generara alucinaciones ('inventara' datos no contemplados) u omitiera validaciones, exponiendo potencialmente información confidencial del Historial de Transacciones y rompiendo el estricto aislamiento de datos exigido por el PRD ante la ausencia de _guardrails_ rigurosos."
