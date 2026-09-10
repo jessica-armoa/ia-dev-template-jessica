@@ -5,7 +5,6 @@ from openai import OpenAI, OpenAIError
 from app.agent.logger import log_step
 from app.agent.tools import buscar_regla_prd
 
-
 # Baranda #3 · BUDGET · límite de iteraciones del loo
 MAX_STEPS = 5
 
